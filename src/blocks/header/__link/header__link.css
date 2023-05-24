@@ -1,0 +1,15 @@
+.header__link {
+    color: white;
+    text-decoration: none;
+}
+
+.header__link:hover {
+    opacity: 0.6;
+}
+
+@media (max-width: 620px) {
+    .header__link {
+        margin: 0 auto;
+        margin-bottom: 40px;
+    }
+}
