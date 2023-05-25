@@ -1,40 +1,14 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { authorize } from "../../utils/auth.js";
-
 import Header from "../Header/Header.js";
-import InfoTooltip from "../InfoTooltip/InfoTooltip.js";
 
-function Login({ handleLogin, handleShowInfoTooltip, handleRegStatus }) {
-  const [formValue, setFormValue] = useState({
-    email: "",
-    password: "",
-  });
-  const { email, password } = formValue;
-  const navigate = useNavigate();
+function Login({ onLogin, handleFormValueSign, formValue }) {
 
   function handleChangeForm(evt) {
     const { name, value } = evt.target;
-    setFormValue({ ...formValue, [name]: value });
+    handleFormValueSign({ ...formValue, [name]: value });
   }
   function handleSubmit(evt) {
     evt.preventDefault();
-    const { email, password } = formValue;
-    authorize({ email, password })
-      .then((data) => {
-        handleLogin(formValue);
-        localStorage.setItem("token", data.token);
-        navigate("/");
-      })
-      .catch((err) => {
-        handleRegStatus(false);
-        handleShowInfoTooltip();
-        setFormValue({
-          email: "",
-          password: "",
-        });
-        console.log(err);
-      });
+    onLogin(formValue)
   }
   return (
     <>
@@ -43,7 +17,6 @@ function Login({ handleLogin, handleShowInfoTooltip, handleRegStatus }) {
         <div className="sign__container">
           <h1 className="sign__title">Вход</h1>
           <form
-            onChange={handleChangeForm}
             onSubmit={handleSubmit}
             className="sign__form"
           >
@@ -53,7 +26,8 @@ function Login({ handleLogin, handleShowInfoTooltip, handleRegStatus }) {
               type="email"
               placeholder="Email"
               required
-              value={email}
+              value={formValue.email}
+              onChange={handleChangeForm}
             ></input>
             <input
               className="sign__input"
@@ -63,13 +37,13 @@ function Login({ handleLogin, handleShowInfoTooltip, handleRegStatus }) {
               maxLength="30"
               placeholder="Пароль"
               required
-              value={password}
+              value={formValue.password}
+              onChange={handleChangeForm}
             ></input>
             <button className="sign__button">Войти</button>
           </form>
         </div>
       </section>
-      <InfoTooltip />
     </>
   );
 }

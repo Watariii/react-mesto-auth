@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import Main from "./Main/Main.js";
@@ -12,49 +12,42 @@ import AddPlacePopup from "./AddPlacePopup/AddPlacePopup.js";
 import Login from "./Login/Login.js";
 import Register from "./Register/Register.js";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.js";
-import { getUsersMe } from "../utils/auth.js";
+import { register, authorize, getUsersMe } from "../utils/auth.js";
 import InfoTooltip from "./InfoTooltip/InfoTooltip.js";
 
 function App() {
-  const [isEditProfilePopUpOpen, setIsEditProfilePopUpOpen] =
-    React.useState(false);
-  const [isAddCardPopUpOpen, setIsAddCardPopUpOpen] = React.useState(false);
-  const [isEditAvatarPopUpOpen, setIsEditAvatarPopUpOpen] =
-    React.useState(false);
-  const [isImagePopUpOpen, setIsImagePopUpOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState({
+  const [isEditProfilePopUpOpen, setIsEditProfilePopUpOpen] = useState(false);
+  const [isAddCardPopUpOpen, setIsAddCardPopUpOpen] = useState(false);
+  const [isEditAvatarPopUpOpen, setIsEditAvatarPopUpOpen] = useState(false);
+  const [isImagePopUpOpen, setIsImagePopUpOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({
     name: "",
     link: "#",
   });
 
-  const [currentUser, setCurrentUser] = React.useState({
+  const [currentUser, setCurrentUser] = useState({
     name: "",
     about: "",
     avatar: "",
   });
-  const [cards, setCards] = React.useState([]);
+  const [cards, setCards] = useState([]);
 
-  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
-  const [userEmail, setUserEmail] = React.useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   const navigate = useNavigate();
 
-  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
-  const [regStatus, setRegStatus] = React.useState(true);
+  const [regStatus, setRegStatus] = useState(true);
 
-  //монтирование
-  React.useEffect(() => {
-    Promise.all([api.getInitialCards(), api.getUserInfo()])
-      .then(([cards, userData]) => {
-        setCurrentUser(userData);
-        setCards(cards);
-      })
-      .catch((err) => {
-        alert(err);
-      });
-  }, []);
+  const [formValue, setFormValue] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [infoTooltipMessage, setInfoTooltipMessage] = useState("");
 
   function handleEditProfileClick() {
     setIsEditProfilePopUpOpen(!isEditProfilePopUpOpen);
@@ -143,9 +136,36 @@ function App() {
       });
   }
 
-  function handleLogin({ email }) {
-    setLoggedIn(true);
-    setUserEmail(email);
+  function handleLogin({ email, password }) {
+    authorize({ email, password })
+      .then((data) => {
+        Promise.all([api.getInitialCards(), api.getUserInfo()])
+          .then(([cards, userData]) => {
+            setCurrentUser(userData);
+            setCards(cards);
+          })
+          .catch((err) => {
+            alert(err);
+          });
+        setLoggedIn(true);
+        setUserEmail(email);
+        localStorage.setItem("token", data.token);
+        navigate("/");
+        setFormValue({
+          email: "",
+          password: "",
+        });
+      })
+      .catch((err) => {
+        handleRegStatus(false);
+        setInfoTooltipMessage("Что то пошло не так! Попробуйте ещё раз.");
+        handleShowInfoTooltip();
+        setFormValue({
+          email: "",
+          password: "",
+        });
+        console.log(err);
+      });
   }
   function handleLogout() {
     const token = localStorage.getItem("token");
@@ -163,7 +183,7 @@ function App() {
           navigate("/");
         })
         .catch((err) => {
-          alert(err);
+          console.log(err);
         });
     }
   }
@@ -176,14 +196,36 @@ function App() {
     setRegStatus(status);
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     checkToken();
   }, []);
 
+  function handleRegister({ email, password }) {
+    register({ email, password })
+      .then(() => {
+        handleRegStatus(true);
+        setInfoTooltipMessage("Вы успешно зарегистрировались!");
+        handleShowInfoTooltip();
+        setFormValue({
+          email: "",
+          password: "",
+        });
+        navigate("/sign-in", { replace: true });
+      })
+      .catch((err) => {
+        handleRegStatus(false);
+        setInfoTooltipMessage("Что то пошло не так! Попробуйте ещё раз.");
+        handleShowInfoTooltip();
+        console.error(err);
+      });
+  }
+  function handleFormValueSign(dataValue) {
+    setFormValue(dataValue);
+  }
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <Routes>
-        //защищает компонент main от ввода url вручную
+        {/* защищает компонент main от ввода url вручную */}
         <Route
           path="/"
           element={
@@ -202,24 +244,36 @@ function App() {
             />
           }
         />
-        //направляет пользователя на '/' или '/sign-in' в зависимости от
-        авторизации , если тот введёт несуществующую ссылку после типа
-        '/fdgfdgd'
+        {/*направляет пользователя на '/' или '/sign-in' в зависимости от
+        авторизации , если тот введёт несуществующую ссылку типа
+        '/fdgfdgd' */}
         <Route
           path="*"
           element={
             loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" replace />
           }
         />
+        {/* авторизация */}
         <Route
-          //авторизация
           path="/sign-in"
-          element={<Login handleLogin={handleLogin} handleShowInfoTooltip={handleShowInfoTooltip} handleRegStatus={handleRegStatus} />}
+          element={
+            <Login
+              onLogin={handleLogin}
+              handleFormValueSign={handleFormValueSign}
+              formValue={formValue}
+            />
+          }
         />
         <Route
           //регистрация
           path="/sign-up"
-          element={<Register handleShowInfoTooltip={handleShowInfoTooltip} handleRegStatus={handleRegStatus} />}
+          element={
+            <Register
+              onRegister={handleRegister}
+              handleFormValueSign={handleFormValueSign}
+              formValue={formValue}
+            />
+          }
         />
       </Routes>
       <EditProfilePopup
@@ -250,7 +304,12 @@ function App() {
         card={selectedCard}
         onClose={closeAllPopups}
       />
-      <InfoTooltip isOpen={isInfoTooltipOpen} onClose={closeAllPopups} regStatus={regStatus} />
+      <InfoTooltip
+        isOpen={isInfoTooltipOpen}
+        onClose={closeAllPopups}
+        regStatus={regStatus}
+        message={infoTooltipMessage}
+      />
     </CurrentUserContext.Provider>
   );
 }

@@ -1,6 +1,6 @@
 import success from "../../images/success.svg";
 import failure from "../../images/failure.svg";
-function InfoTooltip({ isOpen, onClose, regStatus }) {
+function InfoTooltip({ isOpen, onClose, regStatus, message }) {
   return (
     <section className={`pop-up ${isOpen ? "pop-up_opened" : ""}`}>
       <div className="pop-up__container">
@@ -16,9 +16,7 @@ function InfoTooltip({ isOpen, onClose, regStatus }) {
           alt="иконка статуса"
         />
         <h3 className="pop-up__title pop-up__title_type_info-tooltip">
-          {regStatus
-            ? "Вы успешно зарегистрировались!"
-            : "Что то пошло не так! Попробуйте ещё раз."}
+          {message}
         </h3>
       </div>
     </section>

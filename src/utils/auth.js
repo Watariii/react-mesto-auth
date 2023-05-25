@@ -11,12 +11,7 @@ function register({ email, password }) {
       email: `${email}`,
       password: `${password}`,
     }),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  });
+  }).then(checkStatus());
 }
 function authorize({ email, password }) {
     return fetch(`${base_url}/signin`, {
@@ -28,12 +23,7 @@ function authorize({ email, password }) {
           email: `${email}`,
           password: `${password}`,
         }),
-      }).then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-        return Promise.reject(`Ошибка: ${res.status}`);
-      });
+      }).then(checkStatus());
 }
 
 //получение токена и email
@@ -45,12 +35,16 @@ function getUsersMe(token) {
           "Authorization" : `Bearer ${token}`
         }
       
-      }).then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-        return Promise.reject(`Ошибка: ${res.status}`);
-      });
+      }).then(checkStatus());
+}
+
+function checkStatus() {
+  return (res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  };
 }
 
 export { base_url, register, authorize, getUsersMe};
