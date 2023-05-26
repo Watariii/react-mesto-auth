@@ -47,6 +47,18 @@ function App() {
     password: "",
   });
 
+  useEffect(()=> {
+    if (loggedIn)
+    Promise.all([api.getInitialCards(), api.getUserInfo()])
+    .then(([cards, userData]) => {
+      setCurrentUser(userData);
+      setCards(cards);
+    })
+    .catch((err) => {
+      alert(err);
+    });
+  }, [loggedIn])
+
   const [infoTooltipMessage, setInfoTooltipMessage] = useState("");
 
   function handleEditProfileClick() {
@@ -139,14 +151,6 @@ function App() {
   function handleLogin({ email, password }) {
     authorize({ email, password })
       .then((data) => {
-        Promise.all([api.getInitialCards(), api.getUserInfo()])
-          .then(([cards, userData]) => {
-            setCurrentUser(userData);
-            setCards(cards);
-          })
-          .catch((err) => {
-            alert(err);
-          });
         setLoggedIn(true);
         setUserEmail(email);
         localStorage.setItem("token", data.token);
@@ -179,8 +183,9 @@ function App() {
     if (token) {
       getUsersMe(token)
         .then(({ data }) => {
-          handleLogin(data);
+          setLoggedIn(true);
           navigate("/");
+          setUserEmail(data.email)
         })
         .catch((err) => {
           console.log(err);
