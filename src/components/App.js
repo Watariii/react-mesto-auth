@@ -46,7 +46,15 @@ function App() {
     email: "",
     password: "",
   });
+// для открытия navBar в main в мобильном разрешении
+  const [navButton, setNavButton] = useState(true);
+  const [isNavBarOpen, setIsNavBarOpen] = useState(false);
 
+  function handleOpenNavBar() {
+    setIsNavBarOpen(!isNavBarOpen);
+    setNavButton(!navButton);
+  }
+// 
   useEffect(()=> {
     if (loggedIn)
     Promise.all([api.getInitialCards(), api.getUserInfo()])
@@ -175,6 +183,7 @@ function App() {
     const token = localStorage.getItem("token");
     if (token) {
       localStorage.removeItem("token");
+      handleOpenNavBar()
     }
   }
 
@@ -246,6 +255,9 @@ function App() {
               loggedIn={loggedIn}
               userEmail={userEmail}
               handleLogout={handleLogout}
+              handleOpenNavBar={handleOpenNavBar}
+              navButton={navButton}
+              isNavBarOpen={isNavBarOpen}
             />
           }
         />

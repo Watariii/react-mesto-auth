@@ -21,7 +21,7 @@
 @media (max-width: 730px) {
     .profile__button-cards {
         margin: 0;
-        margin-left: 80px;
+        margin-top: 20px;
     }
 }
 

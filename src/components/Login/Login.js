@@ -1,6 +1,6 @@
 import Header from "../Header/Header.js";
 
-function Login({ onLogin, handleFormValueSign, formValue }) {
+function Login({ onLogin, handleFormValueSign, formValue}) {
 
   function handleChangeForm(evt) {
     const { name, value } = evt.target;
@@ -12,7 +12,7 @@ function Login({ onLogin, handleFormValueSign, formValue }) {
   }
   return (
     <>
-      <Header navText="Регистрация" adress="sign-up" />
+      <Header navText="Регистрация" adress="sign-up" onMobile={"header__nav_mobile_sign"} />
       <section className="sign">
         <div className="sign__container">
           <h1 className="sign__title">Вход</h1>

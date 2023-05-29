@@ -1,4 +1,4 @@
-import React from "react";
+import { useContext } from "react";
 import Card from "../Card/Card.js";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 
@@ -14,14 +14,26 @@ function Main({
   onCardDelete,
   cards,
   userEmail,
-  handleLogout
+  handleLogout,
+  navButton,
+  isNavBarOpen,
+  handleOpenNavBar
 }) {
-  const currentUser = React.useContext(CurrentUserContext);
- 
+  const currentUser = useContext(CurrentUserContext);
 
   return (
     <>
-      <Header navText='Выйти' email={userEmail} handleLogout={handleLogout} adress='sign-in' />
+      <Header
+        navText="Выйти"
+        email={userEmail}
+        handleLogout={handleLogout}
+        adress="sign-in"
+        onMobile="header__nav_mobile_main"
+        isNavBarOpen={isNavBarOpen}
+      >
+        <button onClick={handleOpenNavBar} className={`header__nav-button ${navButton?"header__nav-button_type_toolbar-icon":"header__nav-button_type_close-icon"} ${isNavBarOpen?"header__nav-button_nav-opened":""}`}></button>
+      </Header>
+
       <main className="content">
         <section className="profile">
           <div className="profile__info">
@@ -69,7 +81,7 @@ function Main({
           </ul>
         </section>
       </main>
-      <Footer/>
+      <Footer />
     </>
   );
 }

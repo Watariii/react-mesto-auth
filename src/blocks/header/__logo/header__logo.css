@@ -5,8 +5,14 @@
     background-size: contain;
     background-repeat: no-repeat;
 }
+@media (max-width: 620px) {
+    .header__logo {
 
-@media (max-width: 320px) {
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 350px) {
     .header__logo {
         width: 103.74px;
         height: 24.4px;
@@ -14,10 +20,3 @@
     }
 }
 
-
-@media (max-width: 620px) {
-    .header__logo {
-        margin-top: 29px;
-        margin-bottom: 30px;
-    }
-}

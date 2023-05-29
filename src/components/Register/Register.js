@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Header from "../Header/Header.js";
 
-function Register({ onRegister, handleFormValueSign, formValue }) {
+function Register({ onRegister, handleFormValueSign, formValue}) {
   
   function handleChangeForm(evt) {
     const { name, value } = evt.target;
@@ -15,7 +15,7 @@ function Register({ onRegister, handleFormValueSign, formValue }) {
 
   return (
     <>
-      <Header navText="Войти" adress="sign-in" />
+      <Header navText="Войти" adress="sign-in" onMobile={"header__nav_mobile_sign"}/>
       <section className="sign">
         <div className="sign__container">
           <h1 className="sign__title">Регистрация</h1>
