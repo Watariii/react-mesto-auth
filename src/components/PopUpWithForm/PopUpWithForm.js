@@ -1,10 +1,18 @@
 import React from "react";
 
-function PopupWithForm({ name, title, buttonText, isOpen, onClose, children, onSubmit }) {
+function PopupWithForm({
+  name,
+  title,
+  buttonText,
+  isOpen,
+  onClose,
+  children,
+  onSubmit,
+  onCardDelete,
+  card,
+}) {
   return (
-    <section
-      className={`pop-up ${isOpen ? "pop-up_opened" : ""}`}
-    >
+    <section className={`pop-up ${isOpen ? "pop-up_opened" : ""}`}>
       <div className="pop-up__container">
         <button
           onClick={onClose}
@@ -19,7 +27,17 @@ function PopupWithForm({ name, title, buttonText, isOpen, onClose, children, onS
           onSubmit={onSubmit}
         >
           {children}
-          <button className="pop-up__button" type="submit">
+          {/* проверка с if необходима для того, чтобы функция onCardDelete выполнялась только для попапа,
+           в который передается card (popup подтверждения удаления карточки */}
+          <button
+            onClick={() => {
+              if (card) {
+                onCardDelete(card);
+              }
+            }}
+            className="pop-up__button"
+            type="submit"
+          >
             {buttonText}
           </button>
         </form>

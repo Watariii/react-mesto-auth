@@ -1,7 +1,7 @@
 import React from "react";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 
-function Card({ card, onCardClick, onCardLike, onCardDelete }) {
+function Card({ card, onCardClick, onCardLike,handleSubmitPopupClick }) {
   const currentUser = React.useContext(CurrentUserContext);
 
   const isOwn = card.owner._id === currentUser._id;
@@ -15,7 +15,7 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
     <li key={card._id}>
       <article className="photo-elements__item">
         {isOwn && 
-          <button onClick={() => {onCardDelete(card)}}
+          <button onClick={()=>{handleSubmitPopupClick(card)}}
             className="photo-elements__delete"
             type="button"
           />

@@ -11,7 +11,7 @@ function Main({
   onEditAvatar,
   onCardClick,
   onCardLike,
-  onCardDelete,
+  handleSubmitPopupClick,
   cards,
   userEmail,
   handleLogout,
@@ -75,7 +75,7 @@ function Main({
                 card={cardData}
                 onCardClick={onCardClick}
                 onCardLike={onCardLike}
-                onCardDelete={onCardDelete}
+                handleSubmitPopupClick={handleSubmitPopupClick}
               />
             ))}
           </ul>

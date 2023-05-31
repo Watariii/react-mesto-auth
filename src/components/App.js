@@ -24,6 +24,7 @@ function App() {
     name: "",
     link: "#",
   });
+  const [isPopupWithFormOpen, setIsPopupWithFormOpen] = useState(false);
 
   const [currentUser, setCurrentUser] = useState({
     name: "",
@@ -46,7 +47,8 @@ function App() {
     email: "",
     password: "",
   });
-// для открытия navBar в main в мобильном разрешении
+
+  // для открытия navBar в main в мобильном разрешении
   const [navButton, setNavButton] = useState(true);
   const [isNavBarOpen, setIsNavBarOpen] = useState(false);
 
@@ -54,18 +56,23 @@ function App() {
     setIsNavBarOpen(!isNavBarOpen);
     setNavButton(!navButton);
   }
-// 
-  useEffect(()=> {
+
+  function handleCloseNavBar() {
+    setIsNavBarOpen(false);
+    setNavButton(true);
+  }
+  //
+  useEffect(() => {
     if (loggedIn)
-    Promise.all([api.getInitialCards(), api.getUserInfo()])
-    .then(([cards, userData]) => {
-      setCurrentUser(userData);
-      setCards(cards);
-    })
-    .catch((err) => {
-      alert(err);
-    });
-  }, [loggedIn])
+      Promise.all([api.getInitialCards(), api.getUserInfo()])
+        .then(([cards, userData]) => {
+          setCurrentUser(userData);
+          setCards(cards);
+        })
+        .catch((err) => {
+          alert(err);
+        });
+  }, [loggedIn]);
 
   const [infoTooltipMessage, setInfoTooltipMessage] = useState("");
 
@@ -84,12 +91,18 @@ function App() {
     setSelectedCard(card);
   }
 
+  function handleSubmitPopupClick(card) {
+    setIsPopupWithFormOpen(!isPopupWithFormOpen);
+    setSelectedCard(card);
+  }
+
   function closeAllPopups() {
     setIsEditProfilePopUpOpen(false);
     setIsAddCardPopUpOpen(false);
     setIsEditAvatarPopUpOpen(false);
     setIsImagePopUpOpen(false);
     setIsInfoTooltipOpen(false);
+    setIsPopupWithFormOpen(false);
     setTimeout(() => setSelectedCard({ name: "", link: "#" }), 400);
   }
   function handleCardLike(card) {
@@ -114,6 +127,7 @@ function App() {
         setCards((stateCard) =>
           stateCard.filter((item) => item._id !== card._id)
         );
+        closeAllPopups();
       })
       .catch((err) => {
         alert(err);
@@ -159,6 +173,7 @@ function App() {
   function handleLogin({ email, password }) {
     authorize({ email, password })
       .then((data) => {
+        handleCloseNavBar();
         setLoggedIn(true);
         setUserEmail(email);
         localStorage.setItem("token", data.token);
@@ -183,7 +198,7 @@ function App() {
     const token = localStorage.getItem("token");
     if (token) {
       localStorage.removeItem("token");
-      handleOpenNavBar()
+      handleOpenNavBar();
     }
   }
 
@@ -194,7 +209,7 @@ function App() {
         .then(({ data }) => {
           setLoggedIn(true);
           navigate("/");
-          setUserEmail(data.email)
+          setUserEmail(data.email);
         })
         .catch((err) => {
           console.log(err);
@@ -250,7 +265,7 @@ function App() {
               onEditAvatar={handleEditAvatarClick}
               onCardClick={handleCardClick}
               onCardLike={handleCardLike}
-              onCardDelete={handleCardDelete}
+              handleSubmitPopupClick={handleSubmitPopupClick}
               cards={cards}
               loggedIn={loggedIn}
               userEmail={userEmail}
@@ -308,6 +323,15 @@ function App() {
         name="delete-card"
         title="Вы уверены?"
         buttonText="Да"
+        isOpen={isPopupWithFormOpen}
+        onClose={closeAllPopups}
+        card={selectedCard}
+        onCardDelete={handleCardDelete}
+        //без пропса onSubmit и обнуления поведения submit выполняется 
+        //перезапуск страницы при нажатии на button Submit, убрали это поведение
+        onSubmit={(evt) => {
+          evt.preventDefault();
+        }}
       ></PopupWithForm>
 
       <EditAvatarPopup
